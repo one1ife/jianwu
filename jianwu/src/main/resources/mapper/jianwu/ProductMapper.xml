@@ -9,6 +9,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="productName"    column="product_name"    />
         <result property="productSort"    column="product_sort"    />
         <result property="userId"    column="user_id"    />
+        <result property="categoryId"    column="category_id"    />
         <result property="buyDate"    column="buy_date"    />
         <result property="price"    column="price"    />
         <result property="icon"    column="icon"    />
@@ -21,7 +22,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </resultMap>
 
     <sql id="selectProductVo">
-        select product_id, product_name, product_sort, user_id, buy_date, price, icon, status, create_by, create_time, update_by, update_time, remark from jianwu_product
+        select product_id, product_name, product_sort, user_id, category_id, buy_date, price, icon, status, create_by, create_time, update_by, update_time, remark from jianwu_product
     </sql>
 
     <select id="selectProductList" parameterType="Product" resultMap="ProductResult">
@@ -30,6 +31,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="productName != null  and productName != ''"> and product_name like concat('%', #{productName}, '%')</if>
             <if test="productSort != null "> and product_sort = #{productSort}</if>
             <if test="userId != null "> and user_id = #{userId}</if>
+            <if test="categoryId != null "> and category_id = #{categoryId}</if>
             <if test="buyDate != null "> and buy_date = #{buyDate}</if>
             <if test="price != null "> and price = #{price}</if>
             <if test="icon != null  and icon != ''"> and icon = #{icon}</if>
@@ -41,13 +43,21 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <include refid="selectProductVo"/>
         where product_id = #{productId}
     </select>
+    
+    <select id="countProductByCategoryId" parameterType="map" resultType="int">
+        select count(1) from jianwu_product 
+        where category_id = #{categoryId} 
+        and status = '0'
+        <if test="userId != null"> and user_id = #{userId}</if>
+    </select>
 
     <insert id="insertProduct" parameterType="Product" useGeneratedKeys="true" keyProperty="productId">
         insert into jianwu_product
         <trim prefix="(" suffix=")" suffixOverrides=",">
-            <if test="productName != null">product_name,</if>
+            <if test="productName != null and productName != ''">product_name,</if>
             <if test="productSort != null">product_sort,</if>
             <if test="userId != null">user_id,</if>
+            <if test="categoryId != null">category_id,</if>
             <if test="buyDate != null">buy_date,</if>
             <if test="price != null">price,</if>
             <if test="icon != null">icon,</if>
@@ -59,9 +69,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="remark != null">remark,</if>
          </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
-            <if test="productName != null">#{productName},</if>
+            <if test="productName != null and productName != ''">#{productName},</if>
             <if test="productSort != null">#{productSort},</if>
             <if test="userId != null">#{userId},</if>
+            <if test="categoryId != null">#{categoryId},</if>
             <if test="buyDate != null">#{buyDate},</if>
             <if test="price != null">#{price},</if>
             <if test="icon != null">#{icon},</if>
@@ -77,9 +88,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <update id="updateProduct" parameterType="Product">
         update jianwu_product
         <trim prefix="SET" suffixOverrides=",">
-            <if test="productName != null">product_name = #{productName},</if>
+            <if test="productName != null and productName != ''">product_name = #{productName},</if>
             <if test="productSort != null">product_sort = #{productSort},</if>
             <if test="userId != null">user_id = #{userId},</if>
+            <if test="categoryId != null">category_id = #{categoryId},</if>
             <if test="buyDate != null">buy_date = #{buyDate},</if>
             <if test="price != null">price = #{price},</if>
             <if test="icon != null">icon = #{icon},</if>

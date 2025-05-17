@@ -9,6 +9,16 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
+      <el-form-item label="物品分类" prop="categoryId">
+        <el-select v-model="queryParams.categoryId" placeholder="请选择物品分类" clearable>
+          <el-option
+            v-for="item in categoryOptions"
+            :key="item.categoryId"
+            :label="item.categoryName"
+            :value="item.categoryId"
+          />
+        </el-select>
+      </el-form-item>
       <el-form-item label="显示顺序" prop="productSort">
         <el-input
           v-model="queryParams.productSort"
@@ -105,6 +115,11 @@
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="物品ID" align="center" prop="productId" />
       <el-table-column label="物品名称" align="center" prop="productName" />
+      <el-table-column label="所属分类" align="center" prop="categoryId">
+        <template slot-scope="scope">
+          <span>{{ getCategoryName(scope.row.categoryId) }}</span>
+        </template>
+      </el-table-column>
       <el-table-column label="显示顺序" align="center" prop="productSort" />
       <el-table-column label="用户ID" align="center" prop="userId" />
       <el-table-column label="购买时间" align="center" prop="buyDate" width="180">
@@ -150,6 +165,16 @@
         <el-form-item label="物品名称" prop="productName">
           <el-input v-model="form.productName" placeholder="请输入物品名称" />
         </el-form-item>
+        <el-form-item label="物品分类" prop="categoryId">
+          <el-select v-model="form.categoryId" placeholder="请选择物品分类" style="width: 100%;">
+            <el-option
+              v-for="item in categoryOptions"
+              :key="item.categoryId"
+              :label="item.categoryName"
+              :value="item.categoryId"
+            />
+          </el-select>
+        </el-form-item>
         <el-form-item label="显示顺序" prop="productSort">
           <el-input v-model="form.productSort" placeholder="请输入显示顺序" />
         </el-form-item>
@@ -184,11 +209,16 @@
 
 <script>
 import { listProduct, getProduct, delProduct, addProduct, updateProduct } from "@/api/jianwu/product";
+import { listCategory } from "@/api/jianwu/category";
 
 export default {
   name: "Product",
   data() {
     return {
+      // 分类选项
+      categoryOptions: [],
+      // 分类数据映射
+      categoryMap: {},
       // 遮罩层
       loading: true,
       // 选中数组
@@ -212,6 +242,7 @@ export default {
         pageNum: 1,
         pageSize: 10,
         productName: null,
+        categoryId: null,
         productSort: null,
         userId: null,
         buyDate: null,
@@ -223,13 +254,34 @@ export default {
       form: {},
       // 表单校验
       rules: {
+        productName: [
+          { required: true, message: "物品名称不能为空", trigger: "blur" }
+        ],
+        categoryId: [
+          { required: true, message: "物品分类不能为空", trigger: "change" }
+        ]
       }
     };
   },
   created() {
     this.getList();
+    this.getCategories();
   },
   methods: {
+    // 获取分类列表
+    getCategories() {
+      listCategory().then(response => {
+        this.categoryOptions = response.rows;
+        // 构建分类ID到分类名称的映射
+        this.categoryOptions.forEach(item => {
+          this.categoryMap[item.categoryId] = item.categoryName;
+        });
+      });
+    },
+    // 根据分类ID获取分类名称
+    getCategoryName(categoryId) {
+      return categoryId ? this.categoryMap[categoryId] : '未分类';
+    },
     /** 查询物品信息列表 */
     getList() {
       this.loading = true;
@@ -249,6 +301,7 @@ export default {
       this.form = {
         productId: null,
         productName: null,
+        categoryId: null,
         productSort: null,
         userId: null,
         buyDate: null,

@@ -17,6 +17,7 @@ import com.ruoyi.framework.manager.AsyncManager;
 import com.ruoyi.framework.manager.factory.AsyncFactory;
 import com.ruoyi.system.service.ISysConfigService;
 import com.ruoyi.system.service.ISysUserService;
+import com.ruoyi.jianwu.service.IProductCategoryService;
 
 /**
  * 注册校验方法
@@ -34,6 +35,9 @@ public class SysRegisterService
 
     @Autowired
     private RedisCache redisCache;
+    
+    @Autowired
+    private IProductCategoryService productCategoryService;
 
     /**
      * 注册
@@ -85,6 +89,18 @@ public class SysRegisterService
             else
             {
                 AsyncManager.me().execute(AsyncFactory.recordLogininfor(username, Constants.REGISTER, MessageUtils.message("user.register.success")));
+                
+                // 为新用户创建默认分类
+                try {
+                    // 获取注册后的用户信息
+                    SysUser newUser = userService.selectUserByUserName(username);
+                    if (newUser != null && newUser.getUserId() != null) {
+                        productCategoryService.createDefaultCategories(newUser.getUserId(), username);
+                    }
+                } catch (Exception e) {
+                    // 分类创建失败不影响用户注册
+                    e.printStackTrace();
+                }
             }
         }
         return msg;

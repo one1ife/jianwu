@@ -1,6 +1,8 @@
 package com.ruoyi.jianwu.service.impl;
 
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 import com.ruoyi.common.utils.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -92,5 +94,21 @@ public class ProductServiceImpl implements IProductService
     public int deleteProductByProductId(Long productId)
     {
         return productMapper.deleteProductByProductId(productId);
+    }
+
+    /**
+     * 统计分类下的物品数量
+     * 
+     * @param categoryId 分类ID
+     * @param userId 用户ID
+     * @return 物品数量
+     */
+    @Override
+    public int countProductByCategoryId(Long categoryId, Long userId)
+    {
+        Map<String, Object> params = new HashMap<>();
+        params.put("categoryId", categoryId);
+        params.put("userId", userId);
+        return productMapper.countProductByCategoryId(params);
     }
 }

@@ -58,4 +58,13 @@ public interface IProductService
      * @return 结果
      */
     public int deleteProductByProductId(Long productId);
+    
+    /**
+     * 统计分类下的物品数量
+     * 
+     * @param categoryId 分类ID
+     * @param userId 用户ID
+     * @return 物品数量
+     */
+    public int countProductByCategoryId(Long categoryId, Long userId);
 }

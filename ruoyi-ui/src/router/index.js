@@ -37,13 +37,18 @@ export const constantRoutes = [
     children: [
       {
         path: '/redirect/:path(.*)',
-        component: () => import('@/views/redirect')
+        component: (resolve) => require(['@/views/redirect'], resolve)
       }
     ]
   },
   {
     path: '/login',
-    component: () => import('@/views/login'),
+    component: (resolve) => require(['@/views/login'], resolve),
+    hidden: true
+  },
+  {
+    path: '/m-login',
+    component: (resolve) => require(['@/views/m-login'], resolve),
     hidden: true
   },
   {
@@ -87,6 +92,59 @@ export const constantRoutes = [
         meta: { title: '个人中心', icon: 'user' }
       }
     ]
+  },
+  {
+    path: '/m',
+    component: (resolve) => require(['@/views/m-layout'], resolve),
+    redirect: '/m-home',
+    hidden: true,
+    children: [
+      {
+        path: '/m-home',
+        component: (resolve) => require(['@/views/m-home'], resolve),
+        name: '移动端首页',
+        meta: { title: '首页', icon: 'dashboard' }
+      },
+      {
+        path: '/m-add',
+        component: (resolve) => require(['@/views/m-add'], resolve),
+        name: '添加物品',
+        meta: { title: '添加物品', icon: 'plus' }
+      },
+      {
+        path: '/m-settings',
+        component: (resolve) => require(['@/views/m-settings'], resolve),
+        name: '设置',
+        meta: { title: '设置', icon: 'setting' }
+      }
+    ]
+  },
+  // 移动端个人信息相关页面
+  {
+    path: '/m-userinfo',
+    component: (resolve) => require(['@/views/m-userinfo'], resolve),
+    hidden: true
+  },
+  {
+    path: '/m-resetpwd',
+    component: (resolve) => require(['@/views/m-resetpwd'], resolve),
+    hidden: true
+  },
+  {
+    path: '/m-category',
+    component: (resolve) => require(['@/views/m-category'], resolve),
+    hidden: true
+  },
+  // 移动端物品详情和编辑页面
+  {
+    path: '/m-product-detail',
+    component: (resolve) => require(['@/views/m-product-detail'], resolve),
+    hidden: true
+  },
+  {
+    path: '/m-edit',
+    component: (resolve) => require(['@/views/m-edit'], resolve),
+    hidden: true
   }
 ]
 

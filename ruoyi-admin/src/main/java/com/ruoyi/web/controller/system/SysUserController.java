@@ -31,6 +31,7 @@ import com.ruoyi.system.service.ISysDeptService;
 import com.ruoyi.system.service.ISysPostService;
 import com.ruoyi.system.service.ISysRoleService;
 import com.ruoyi.system.service.ISysUserService;
+import com.ruoyi.jianwu.service.IProductCategoryService;
 
 /**
  * 用户信息
@@ -52,6 +53,9 @@ public class SysUserController extends BaseController
 
     @Autowired
     private ISysPostService postService;
+    
+    @Autowired
+    private IProductCategoryService productCategoryService;
 
     /**
      * 获取用户列表
@@ -140,7 +144,17 @@ public class SysUserController extends BaseController
         }
         user.setCreateBy(getUsername());
         user.setPassword(SecurityUtils.encryptPassword(user.getPassword()));
-        return toAjax(userService.insertUser(user));
+        int rows = userService.insertUser(user);
+        
+        try {
+            // 为新用户创建默认分类
+            productCategoryService.createDefaultCategories(user.getUserId(), user.getUserName());
+        } catch (Exception e) {
+            // 分类创建失败不影响用户创建
+            e.printStackTrace();
+        }
+        
+        return toAjax(rows);
     }
 
     /**

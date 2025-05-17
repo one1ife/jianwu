@@ -1,6 +1,8 @@
 package com.ruoyi.jianwu.mapper;
 
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 import com.ruoyi.jianwu.domain.Product;
 
 /**
@@ -58,4 +60,12 @@ public interface ProductMapper
      * @return 结果
      */
     public int deleteProductByProductIds(Long[] productIds);
+    
+    /**
+     * 统计分类下的物品数量
+     * 
+     * @param params 参数Map，包含categoryId和userId
+     * @return 物品数量
+     */
+    public int countProductByCategoryId(Map<String, Object> params);
 }

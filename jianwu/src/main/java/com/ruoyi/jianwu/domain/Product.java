@@ -33,6 +33,10 @@ public class Product extends BaseEntity
     @Excel(name = "用户ID")
     private Long userId;
 
+    /** 分类ID */
+    @Excel(name = "分类ID")
+    private Long categoryId;
+
     /** 购买时间 */
     @JsonFormat(pattern = "yyyy-MM-dd")
     @Excel(name = "购买时间", width = 30, dateFormat = "yyyy-MM-dd")
@@ -89,6 +93,16 @@ public class Product extends BaseEntity
     {
         return userId;
     }
+    
+    public void setCategoryId(Long categoryId) 
+    {
+        this.categoryId = categoryId;
+    }
+
+    public Long getCategoryId() 
+    {
+        return categoryId;
+    }
 
     public void setBuyDate(Date buyDate) 
     {
@@ -137,6 +151,7 @@ public class Product extends BaseEntity
             .append("productName", getProductName())
             .append("productSort", getProductSort())
             .append("userId", getUserId())
+            .append("categoryId", getCategoryId())
             .append("buyDate", getBuyDate())
             .append("price", getPrice())
             .append("icon", getIcon())

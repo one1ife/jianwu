@@ -6,10 +6,11 @@ import 'nprogress/nprogress.css'
 import { getToken } from '@/utils/auth'
 import { isPathMatch } from '@/utils/validate'
 import { isRelogin } from '@/utils/request'
+import { isMobile, isMobileView } from '@/utils/device'
 
 NProgress.configure({ showSpinner: false })
 
-const whiteList = ['/login', '/register']
+const whiteList = ['/login', '/m-login', '/register']
 
 const isWhiteList = (path) => {
   return whiteList.some(pattern => isPathMatch(pattern, path))
@@ -18,14 +19,21 @@ const isWhiteList = (path) => {
 router.beforeEach((to, from, next) => {
   NProgress.start()
   if (getToken()) {
-    to.meta.title && store.dispatch('settings/setTitle', to.meta.title)
+    // 判断是否为移动端访问
+    const isMobileDevice = isMobile() || isMobileView();
     /* has token*/
-    if (to.path === '/login') {
-      next({ path: '/' })
+    if (to.path === '/login' || to.path === '/m-login') {
+      next({ path: isMobileDevice ? '/m-home' : '/' })
       NProgress.done()
-    } else if (isWhiteList(to.path)) {
-      next()
     } else {
+      // 如果是移动端访问但路径不是/m开头的，重定向到移动端主页
+      if (isMobileDevice && !to.path.startsWith('/m')) {
+        next({ path: '/m-home' });
+        NProgress.done();
+        return;
+      }
+      
+      // 正常访问逻辑
       if (store.getters.roles.length === 0) {
         isRelogin.show = true
         // 判断当前用户是否已拉取完user_info信息
@@ -47,12 +55,18 @@ router.beforeEach((to, from, next) => {
       }
     }
   } else {
-    // 没有token
+    /* has no token*/
     if (isWhiteList(to.path)) {
       // 在免登录白名单，直接进入
       next()
     } else {
-      next(`/login?redirect=${encodeURIComponent(to.fullPath)}`) // 否则全部重定向到登录页
+      // 其他没有访问权限的页面需要先登录
+      // 判断是否为移动设备或窄屏幕，是则跳转到移动版登录页
+      if (isMobile() || isMobileView()) {
+        next(`/m-login?redirect=${encodeURIComponent(to.fullPath)}`)
+      } else {
+        next(`/login?redirect=${encodeURIComponent(to.fullPath)}`)
+      }
       NProgress.done()
     }
   }
